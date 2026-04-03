@@ -29,3 +29,6 @@ Errors, also possible that the tokens returned by the tokenize function won't ma
 Okay, tokenize fixed, made it a pointer to array. Operations work, need to put everything in switch-case cuz its faster idk, and need to introduce float values and need to do python like behavior where we see if its a float or an int and do processing accordingly. 
 
 Remaking tokenize function.
+
+tokenizer remade, and its wonderful its all clean smooth logic no writing same shit code in like 3 places, its all logically controlled and i didn't repeat myself like 20 times. 
+
