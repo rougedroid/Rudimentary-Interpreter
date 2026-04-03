@@ -15,9 +15,17 @@ Twist, use qwertyui for operators to ensure you actually learn't something.
 operation order: BO-DMAS erqw
 
 Token Types:
+0. NULL
 1. Constants
+  1 -> digit ( integer )
+  12 -> char
+  13 -> float
+
 2. Operators
+3. Variable
 
 Errors, also possible that the tokens returned by the tokenize function won't make it cuz the actual tokens struct doesn't have space made with malloc. Rest is syntax errors, deal with it. 
 
 Okay, tokenize fixed, made it a pointer to array. Operations work, need to put everything in switch-case cuz its faster idk, and need to introduce float values and need to do python like behavior where we see if its a float or an int and do processing accordingly. 
+
+Remaking tokenize function.
