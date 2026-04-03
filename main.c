@@ -90,13 +90,25 @@ tokenarray_t *tokenize(char *lineptr) {
       cur_token->token[cur_token->token_length] = trim_line[i];
       cur_token->token_length++;
       cur_token->token_type = 2;
+
+      if (strchr("/<>=+-*", n_ch) == NULL) {
+
+        p_chtkmkr = true;
+        current_token_num++;
+        tokenarray->length = tokenarray->length + 1;
+        ((tokenarray->Tokenarray)[current_token_num]).token[0] = '\0';
+        ((tokenarray->Tokenarray)[current_token_num]).token_length = 0;
+        ((tokenarray->Tokenarray)[current_token_num]).token_type = 0;
+      }
       continue;
     }
 
     if (isdigit(trim_line[i])) {
       cur_token->token[cur_token->token_length] = trim_line[i];
       cur_token->token_length++;
-      cur_token->token_type = 1;
+      if (cur_token->token_length == 1) {
+        cur_token->token_type = 1;
+      }
     }
 
     else if (trim_line[i] == ' ') {
@@ -114,8 +126,30 @@ tokenarray_t *tokenize(char *lineptr) {
       cur_token->token[cur_token->token_length] = trim_line[i];
       cur_token->token_length++;
       cur_token->token_type = 2;
+
+      if (strchr("/<>=+-*", n_ch) == NULL) {
+
+        p_chtkmkr = true;
+        current_token_num++;
+        tokenarray->length = tokenarray->length + 1;
+        ((tokenarray->Tokenarray)[current_token_num]).token[0] = '\0';
+        ((tokenarray->Tokenarray)[current_token_num]).token_length = 0;
+        ((tokenarray->Tokenarray)[current_token_num]).token_type = 0;
+      }
     } else if (strchr(";", trim_line[i]) != NULL) {
       break;
+    }
+
+    else if (isalpha(trim_line[i])) {
+      cur_token->token[cur_token->token_length] = trim_line[i];
+      cur_token->token_length++;
+      cur_token->token_type = 1;
+    }
+
+    if ((isdigit(p_ch) && isdigit(n_ch)) && trim_line[i] == '.') {
+      cur_token->token_length++;
+      cur_token->token_type = 13;
+      cur_token->token[cur_token->token_length - 1] = trim_line[i];
     }
     p_ch = trim_line[i];
   };
@@ -178,7 +212,7 @@ int main() {
 
   printf("Interpreter Launched\n");
   char line[20];
-  strcpy(line, "    51/    16   ");      // line to eval
+  strcpy(line, "    5.1/16   ");         // line to eval
   tokenarray_t *tokens = tokenize(line); // debug
   printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
@@ -187,7 +221,7 @@ int main() {
            ((tokens->Tokenarray) + i)->token_type);
   };
   printf("Launching Processor \n");
-  processor(tokens);
+  //  processor(tokens);
   // char * msg = trim(line); // debug
   // printf("%s \n", msg); //debug
   // free(msg); //debug
