@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define operators "/=-*<>+"
 
 typedef struct Token {
   char token[10];
@@ -13,6 +14,7 @@ typedef struct Token {
 typedef struct TokenArray {
   token_t *Tokenarray;
   int length;
+  int capacity;
 } tokenarray_t;
 
 char *trim(char *text) {
@@ -156,6 +158,112 @@ tokenarray_t *tokenize(char *lineptr) {
   return tokenarray;
 }
 
+tokenarray_t *neotokenize(char *lineptr) {
+
+  int in_len;
+  char *trim_in = trim(lineptr);
+  in_len = strlen(trim_in);
+
+  tokenarray_t *out_tokenarray = malloc(sizeof(tokenarray_t));
+  token_t *cur_token;
+  out_tokenarray->Tokenarray = malloc(sizeof(token_t) * 5);
+  out_tokenarray->length = 0;
+  out_tokenarray->capacity = 5;
+  int cur_token_num = 0;
+  char p_ch = '\0';
+  char n_ch = '\0';
+  char c_ch = '\0';
+  int p_chtkmkr = 0;
+  int c_chtkmkr = 0;
+  cur_token = (out_tokenarray->Tokenarray);
+  cur_token->token[0] = '\0';
+  cur_token->token_length = 0;
+  cur_token->token_type = 0;
+  //  printf("DEBUG: Trimmed contents are: %s \n", trim_in);
+
+  for (int i = 0; i < in_len; i++) {
+    //    printf("DEBUG: i = %d : char = %c : p_chtkmkr = %d \n", i, trim_in[i],
+    //         p_chtkmkr);
+    if (out_tokenarray->capacity == out_tokenarray->length + 1) {
+      //      printf("DEBUG: CAPACITY!!!");
+      out_tokenarray->Tokenarray =
+          realloc(out_tokenarray->Tokenarray,
+                  sizeof(token_t) * (out_tokenarray->capacity) * 2);
+      out_tokenarray->capacity = out_tokenarray->capacity * 2;
+    }
+
+    cur_token = &(out_tokenarray->Tokenarray[cur_token_num]);
+    c_ch = trim_in[i];
+    if (i == in_len - 1) {
+      n_ch = '\0';
+    } else {
+      n_ch = trim_in[i + 1];
+    }
+    if (p_chtkmkr == 1) {
+      c_chtkmkr = 0;
+      p_chtkmkr = 0;
+    } else {
+      if (c_ch == ' ') {
+        c_chtkmkr = 1;
+      }
+      if ((strchr(operators, n_ch) != NULL) &&
+          (strchr(operators, c_ch) == NULL)) {
+        c_chtkmkr = 1; // If next char is an operator but the current char is
+                       // not then end token eg: 12[3]+234 ends after 3
+      }
+
+      if ((strchr(operators, p_ch) != NULL) &&
+          (strchr(operators, c_ch) != NULL)) {
+        c_chtkmkr = 1; // If previous token and current token are operators, end
+                       // token here eg: ++ += -= etc
+      }
+    }
+
+    if (strchr(operators, c_ch)) {
+      c_chtkmkr = 1;
+    }
+
+    if (c_chtkmkr == 1) {
+      out_tokenarray->length++;
+      (out_tokenarray->Tokenarray[cur_token_num + 1]).token[0] = 'L';
+      (out_tokenarray->Tokenarray[cur_token_num + 1]).token_type = 0;
+      (out_tokenarray->Tokenarray[cur_token_num + 1]).token_length = 0;
+      cur_token_num++;
+      p_chtkmkr = 1;
+      c_chtkmkr = 0;
+    } // next token is already made, and will be accesed in the next round of
+      // for loop.
+
+    if (c_ch == ' ') {
+      p_chtkmkr = 1;
+      continue;
+    } else {
+      //      c_ch = 'O';
+      cur_token->token[cur_token->token_length] = c_ch;
+      cur_token->token_length++;
+    }
+  };
+
+  for (int k = 0; k < out_tokenarray->length; k++) {
+    cur_token = out_tokenarray->Tokenarray + k;
+    // typedef for tokens
+    if (isalpha(cur_token->token[0])) {
+      // future expansion for keywords
+      cur_token->token_type = 12;
+    }
+    if (isdigit(cur_token->token[0])) {
+      cur_token->token_type = 1;
+      // float check later
+      //
+    }
+    if (strchr(operators, cur_token->token[0]) != NULL) {
+      cur_token->token_type = 2;
+    }
+  };
+
+  return out_tokenarray;
+}
+
 token_t *operate(tokenarray_t *tokenarray_in) {
 
   int operand_1 = atoi((*(tokenarray_in->Tokenarray)).token);
@@ -211,9 +319,9 @@ char *processor(tokenarray_t *token_in) {
 int main() {
 
   printf("Interpreter Launched\n");
-  char line[20];
-  strcpy(line, "    5.1/16   ");         // line to eval
-  tokenarray_t *tokens = tokenize(line); // debug
+  char line[100];
+  strcpy(line, "    5.1/16 + 43 -df/ fg+   67* lk  "); // line to eval
+  tokenarray_t *tokens = neotokenize(line);            // debug
   printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
   for (int i = 0; i < tokens->length; i++) {
