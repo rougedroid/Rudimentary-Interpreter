@@ -301,31 +301,37 @@ tokenarray_t *processor(tokenarray_t *token_in) {
   int processed = 0;
 
   for (int i = 0; i < tokennum; i++) {
+    if ((token_in->Tokenarray + i)->token_type == 9) {
+      continue;
+    }
     if ((token_in->Tokenarray + i)->token_type == 2) {
       printf("Operator found \n");
-      if (i >= 1) {
+      if ((i >= 1) && i != tokennum) {
         // If one of the tokens is not a constant, then we first get the value
         // of the variable and then make it constant and then send it in. No
         // unary operators at the moment, may have to add another if condition
         // to check that.
         if (((token_in->Tokenarray + i - 1)->token_type == 1) &&
             ((token_in->Tokenarray + i + 1)->token_type == 1)) {
-          tokenarray_t *to_operate;
+          tokenarray_t *to_operate = malloc(sizeof(tokenarray_t));
           to_operate->length = 3;
           to_operate->Tokenarray = malloc(3 * sizeof(token_t));
           for (int k = 0; k < 3; k++) {
             *(to_operate->Tokenarray + k) = *(token_in->Tokenarray + i - 1 + k);
           };
           token_t *operated;
-
+          free(to_operate);
           operated = operate(to_operate);
           //          token_in->length -= 2;
+          /*
           *(token_in->Tokenarray + i - 1) = *operated;
-          for (int k = i + 1; k < token_in->length; k++) {
-            *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
-          };
+          // for (int k = i + 1; k < token_in->length; k++) {
+          //   *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
+          // };
           token_in->length -= 2;
           free(operated);
+          (token_in->Tokenarray + i)->token_type = 9;
+          (token_in->Tokenarray + i + 1)->token_type = 9;*/
         }
       }
     }
