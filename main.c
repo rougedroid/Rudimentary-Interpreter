@@ -268,7 +268,7 @@ tokenarray_t *neotokenize(char *lineptr) {
 }
 
 token_t *operate(tokenarray_t *tokenarray_in) {
-
+  printf("Reached Operate func");
   int operand_1 = atoi((*(tokenarray_in->Tokenarray)).token);
   int operand_2 = atoi((*(tokenarray_in->Tokenarray + 2)).token);
   printf(" Operands are %d and %d \n", operand_1, operand_2);
@@ -320,18 +320,18 @@ tokenarray_t *processor(tokenarray_t *token_in) {
             *(to_operate->Tokenarray + k) = *(token_in->Tokenarray + i - 1 + k);
           };
           token_t *operated;
-          free(to_operate);
           operated = operate(to_operate);
+          free(to_operate);
           //          token_in->length -= 2;
-          /*
-          *(token_in->Tokenarray + i - 1) = *operated;
-          // for (int k = i + 1; k < token_in->length; k++) {
-          //   *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
-          // };
-          token_in->length -= 2;
+
+          *(token_in->Tokenarray + i + 1) = *operated;
+          /* for (int k = i + 1; k < token_in->length; k++) {
+             *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
+           };*/
+          //          token_in->length -= 2;
           free(operated);
           (token_in->Tokenarray + i)->token_type = 9;
-          (token_in->Tokenarray + i + 1)->token_type = 9;*/
+          (token_in->Tokenarray + i + 1)->token_type = 1;
         }
       }
     }
