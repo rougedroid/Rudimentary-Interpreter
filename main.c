@@ -254,12 +254,27 @@ tokenarray_t *neotokenize(char *lineptr) {
       cur_token->token_type = 12;
     }
     if (isdigit(cur_token->token[0])) {
-      cur_token->token_type = 1;
+      cur_token->token_type = 10;
       // float check later
       //
     }
     if (strchr(operators, cur_token->token[0]) != NULL) {
       cur_token->token_type = 2;
+      if (*cur_token->token == '=') {
+        cur_token->token_type = 20;
+      }
+      if (*cur_token->token == '/') {
+        cur_token->token_type = 24;
+      }
+      if (*cur_token->token == '*') {
+        cur_token->token_type = 23;
+      }
+      if (*cur_token->token == '+') {
+        cur_token->token_type = 22;
+      }
+      if (*cur_token->token == '-') {
+        cur_token->token_type = 21;
+      }
     }
     cur_token->token[cur_token->token_length] = '\0';
   };
@@ -291,7 +306,7 @@ token_t *operate(tokenarray_t *tokenarray_in) {
   token_t *result_token = malloc(sizeof(token_t));
   sprintf(result_token->token, "%d", result);
   result_token->token_length = strlen(result_token->token);
-  result_token->token_type = 1;
+  result_token->token_type = 10;
   return result_token;
 }
 
@@ -311,8 +326,8 @@ tokenarray_t *processor(tokenarray_t *token_in) {
         // of the variable and then make it constant and then send it in. No
         // unary operators at the moment, may have to add another if condition
         // to check that.
-        if (((token_in->Tokenarray + i - 1)->token_type == 1) &&
-            ((token_in->Tokenarray + i + 1)->token_type == 1)) {
+        if (((token_in->Tokenarray + i - 1)->token_type == 10) &&
+            ((token_in->Tokenarray + i + 1)->token_type == 10)) {
           tokenarray_t *to_operate = malloc(sizeof(tokenarray_t));
           to_operate->length = 3;
           to_operate->Tokenarray = malloc(3 * sizeof(token_t));
@@ -331,12 +346,34 @@ tokenarray_t *processor(tokenarray_t *token_in) {
           //          token_in->length -= 2;
           free(operated);
           (token_in->Tokenarray + i)->token_type = 9;
-          (token_in->Tokenarray + i + 1)->token_type = 1;
+          (token_in->Tokenarray + i + 1)->token_type = 10;
         }
       }
     }
   };
   return token_in;
+}
+
+tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
+  int *op_index;
+  int op_no = 0;
+  int o;
+  for (o = 0; o < tokenarray_in->length; o++) {
+
+    if ((((tokenarray_in->Tokenarray + o)->token_type) / 10) != 1) {
+      op_no++;
+    }
+  }
+
+  printf("Total Number of Operators: %d \n", op_no);
+
+  op_index = malloc(sizeof(int) * op_no);
+
+  for (o = 0; o < tokenarray_in->length; o++) {
+    if (((tokenarray_in->Tokenarray + o)->token_type) / 10 != 1) {
+      *(op_index + o) = o;
+    }
+  }
 }
 
 int main() {
@@ -345,17 +382,22 @@ int main() {
   char line[100];
   strcpy(line, "    5 -16 + 43 + 3 - 56  "); // line to eval
   tokenarray_t *tokens = neotokenize(line);  // debug
-  printf("%d \n", tokens->length);
+                                             // printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
-  tokenarray_t *processed_tokens = processor(tokens);
-  for (int i = 0; i < processed_tokens->length; i++) {
-    printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
+  /*  tokenarray_t *processed_tokens = processor(tokens);
+    for (int i = 0; i < processed_tokens->length; i++) {
+      printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
            ((processed_tokens->Tokenarray) + i)->token_type);
-  };
+    };*/
   //  printf("Launching Processor \n");
   //  processor(tokens);
   // char * msg = trim(line); // debug
   // printf("%s \n", msg); //debug
   // free(msg); //debug
+  //
+  //
+
+  neoprocessor(tokens);
+
   return 0;
 }

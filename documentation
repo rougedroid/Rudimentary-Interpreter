@@ -17,11 +17,16 @@ operation order: BO-DMAS erqw
 Token Types:
 0. NULL
 1. Constants
-  1 -> digit ( integer )
+  10 -> digit ( integer )
   12 -> char
   13 -> float
 
 2. Operators
+  to implement:
+  20 -> Assignment operators ( = )
+  24 - 27 -> Arithmatic operators ( /*+- )
+  22 -> Mixed Operators ( +=, -=, *=, /= )
+  23 -> Unary Operators ( ++, -- )
 3. Variable
 9. Processed Token
 Errors, also possible that the tokens returned by the tokenize function won't make it cuz the actual tokens struct doesn't have space made with malloc. Rest is syntax errors, deal with it. 
