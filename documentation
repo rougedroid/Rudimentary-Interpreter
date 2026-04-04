@@ -24,11 +24,18 @@ Token Types:
 2. Operators
   to implement:
   20 -> Assignment operators ( = )
-  24 - 27 -> Arithmatic operators ( /*+- )
-  22 -> Mixed Operators ( +=, -=, *=, /= )
-  23 -> Unary Operators ( ++, -- )
+   24 - 27 -> Arithmatic operators ( /*+- )
+   -> Mixed Operators ( +=, -=, *=, /= ) - nah
+   -> Unary Operators ( ++, -- ) -nah 
+  21 -> - 
+  22 -> + 
+  23 -> * 
+  24 -> / 
 3. Variable
 9. Processed Token
+
+Implementation method: the token with higher type number get executed first. 2 digit token type numbers 
+
 Errors, also possible that the tokens returned by the tokenize function won't make it cuz the actual tokens struct doesn't have space made with malloc. Rest is syntax errors, deal with it. 
 
 Okay, tokenize fixed, made it a pointer to array. Operations work, need to put everything in switch-case cuz its faster idk, and need to introduce float values and need to do python like behavior where we see if its a float or an int and do processing accordingly. 
