@@ -33,3 +33,9 @@ Remaking tokenize function.
 tokenizer remade, and its wonderful its all clean smooth logic no writing same shit code in like 3 places, its all logically controlled and i didn't repeat myself like 20 times. 
 need to make a characterizer for float values and also add a keyword detection system to reclassify the token types.
 
+need to process tokens in this order: 
+  functions --> eval and assign value as a token type 1 value
+  variables --> find value from variable array and replace with a type 1 token.
+
+
+
