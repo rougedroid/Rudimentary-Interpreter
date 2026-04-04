@@ -321,7 +321,7 @@ tokenarray_t *processor(tokenarray_t *token_in) {
           operated = operate(to_operate);
           //          token_in->length -= 2;
           *(token_in->Tokenarray + i - 1) = *operated;
-          for (int k = i + 2; k < token_in->length; k++) {
+          for (int k = i + 1; k < token_in->length; k++) {
             *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
           };
           token_in->length -= 2;
