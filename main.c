@@ -45,8 +45,8 @@ char *trim(char *text) {
   strcpy(trimmed_text, text);
   return trimmed_text;
 }
-
-tokenarray_t *tokenize(char *lineptr) {
+/*
+tokenkenarray_t *tokenize(char *lineptr) {
   // Strip spaces
   int l;
   // l = strlen(lineptr);
@@ -157,7 +157,7 @@ tokenarray_t *tokenize(char *lineptr) {
   };
   return tokenarray;
 }
-
+*/
 tokenarray_t *neotokenize(char *lineptr) {
 
   int in_len;
@@ -261,6 +261,7 @@ tokenarray_t *neotokenize(char *lineptr) {
     if (strchr(operators, cur_token->token[0]) != NULL) {
       cur_token->token_type = 2;
     }
+    cur_token->token[cur_token->token_length] = '\0';
   };
 
   return out_tokenarray;
@@ -271,24 +272,30 @@ token_t *operate(tokenarray_t *tokenarray_in) {
   int operand_1 = atoi((*(tokenarray_in->Tokenarray)).token);
   int operand_2 = atoi((*(tokenarray_in->Tokenarray + 2)).token);
   printf(" Operands are %d and %d \n", operand_1, operand_2);
-  if ((*(tokenarray_in->Tokenarray + 1)).token[0] == 'q') {
-    int result = operand_1 + operand_2;
+  int result;
+  if ((*(tokenarray_in->Tokenarray + 1)).token[0] == '+') {
+    result = operand_1 + operand_2;
     printf("Result : %d \n", result);
   }
 
-  else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == 'e') {
-    int result = operand_1 / operand_2;
+  else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == '/') {
+    result = operand_1 / operand_2;
     printf("Result : %d \n", result);
-  } else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == 'r') {
-    int result = operand_1 * operand_2;
+  } else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == '*') {
+    result = operand_1 * operand_2;
     printf("Result : %d \n", result);
-  } else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == 'w') {
-    int result = operand_1 - operand_2;
+  } else if ((*(tokenarray_in->Tokenarray + 1)).token[0] == '-') {
+    result = operand_1 - operand_2;
     printf("Result : %d \n", result);
   }
+  token_t *result_token = malloc(sizeof(token_t));
+  sprintf(result_token->token, "%d", result);
+  result_token->token_length = strlen(result_token->token);
+  result_token->token_type = 1;
+  return result_token;
 }
 
-char *processor(tokenarray_t *token_in) {
+tokenarray_t *processor(tokenarray_t *token_in) {
   printf("Processor Launched \n");
   int tokennum = (token_in->length);
   int processed = 0;
@@ -312,25 +319,34 @@ char *processor(tokenarray_t *token_in) {
           token_t *operated;
 
           operated = operate(to_operate);
+          //          token_in->length -= 2;
+          *(token_in->Tokenarray + i - 1) = *operated;
+          for (int k = i; k < token_in->length; k++) {
+            *(token_in->Tokenarray + k) = *(token_in->Tokenarray + k + 1);
+          };
+          token_in->length -= 2;
+          free(operated);
         }
       }
     }
   };
+  return token_in;
 }
 
 int main() {
 
   printf("Interpreter Launched\n");
   char line[100];
-  strcpy(line, "    5.1/16 + 43 -df/ fg+   67* lk  "); // line to eval
-  tokenarray_t *tokens = neotokenize(line);            // debug
+  strcpy(line, "    5 -16 + 43 + 3 - 56  "); // line to eval
+  tokenarray_t *tokens = neotokenize(line);  // debug
   printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
-  for (int i = 0; i < tokens->length; i++) {
-    printf("%d : %s : %d \n", i, ((tokens->Tokenarray) + i)->token,
-           ((tokens->Tokenarray) + i)->token_type);
+  tokenarray_t *processed_tokens = processor(tokens);
+  for (int i = 0; i < processed_tokens->length; i++) {
+    printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
+           ((processed_tokens->Tokenarray) + i)->token_type);
   };
-  printf("Launching Processor \n");
+  //  printf("Launching Processor \n");
   //  processor(tokens);
   // char * msg = trim(line); // debug
   // printf("%s \n", msg); //debug
