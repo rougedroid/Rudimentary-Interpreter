@@ -236,9 +236,11 @@ tokenarray_t *neotokenize(char *lineptr) {
 
     if (c_ch == ' ') {
       p_chtkmkr = 1;
+      p_ch = c_ch;
       continue;
     } else {
       //      c_ch = 'O';
+      p_ch = c_ch;
       cur_token->token[cur_token->token_length] = c_ch;
       cur_token->token_length++;
     }
