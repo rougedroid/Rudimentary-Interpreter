@@ -365,7 +365,7 @@ typedef struct index_valPair {
 } index_valpair_t;
 
 int compare(const void *a, const void *b) {
-  return ((index_valpair_t *)a)->value - ((index_valpair_t *)b)->value;
+  return ((index_valpair_t *)b)->value - ((index_valpair_t *)a)->value;
 }
 tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
   int *op_index;
