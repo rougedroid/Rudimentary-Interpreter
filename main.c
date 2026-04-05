@@ -227,7 +227,7 @@ tokenarray_t *neotokenize(char *lineptr) {
     if (c_chtkmkr == 1) {
       out_tokenarray->length++;
       (out_tokenarray->Tokenarray[cur_token_num + 1]).token[0] = 'L';
-      (out_tokenarray->Tokenarray[cur_token_num + 1]).token_type = 0;
+      (out_tokenarray->Tokenarray[cur_token_num + 1]).token_type = 8;
       (out_tokenarray->Tokenarray[cur_token_num + 1]).token_length = 0;
       cur_token_num++;
       p_chtkmkr = 1;
@@ -382,28 +382,31 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
   }
   invalpair = malloc(sizeof(index_valpair_t) * op_no);
 
-  printf("Total Number of Operators: %d \n", op_no);
-
   op_index = malloc(sizeof(int) * op_no);
-
-  for (o = 0; o < tokenarray_in->length; o++) {
-    if (((tokenarray_in->Tokenarray + o)->token_type) / 10 != 1) {
-      *(op_index + o) = o;
-      (invalpair + o)->index = o;
-      (invalpair + o)->value = (tokenarray_in->Tokenarray + o)->token_type;
+  int k = 0;
+  for (o = 0; o < (tokenarray_in->length); o++) {
+    if ((((tokenarray_in->Tokenarray + o)->token_type) / 10) != 1) {
+      //*(op_index + o) = o;
+      (invalpair + k)->index = o;
+      (invalpair + k)->value = (tokenarray_in->Tokenarray + o)->token_type;
+      k++;
+      continue;
     }
   }
 
   qsort(invalpair, op_no, sizeof(index_valpair_t), compare);
+  for (o = 0; o < op_no; o++) {
+    printf("%d \n", (invalpair + o)->index);
+  }
 }
 
 int main() {
 
   printf("Interpreter Launched\n");
   char line[100];
-  strcpy(line, "    5 -16 + 43 + 3 - 56  "); // line to eval
-  tokenarray_t *tokens = neotokenize(line);  // debug
-                                             // printf("%d \n", tokens->length);
+  strcpy(line, "    5 -16 / 89 * 43 + 3 - 56  "); // line to eval
+  tokenarray_t *tokens = neotokenize(line);       // debug
+                                            // printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
   /*  tokenarray_t *processed_tokens = processor(tokens);
     for (int i = 0; i < processed_tokens->length; i++) {
