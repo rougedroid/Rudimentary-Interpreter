@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
 #define operators "/=-*<>+"
 
 typedef struct Token {
@@ -353,17 +354,33 @@ tokenarray_t *processor(tokenarray_t *token_in) {
   };
   return token_in;
 }
+/*
+int compare(const void *a, const void *b) {
+    return (*(int*)a - *(int*)b);
+}*/
+typedef struct index_valPair {
+  int index;
+  int value;
 
+} index_valpair_t;
+
+int compare(const void *a, const void *b) {
+  return ((index_valpair_t *)a)->value - ((index_valpair_t *)b)->value;
+}
 tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
   int *op_index;
   int op_no = 0;
   int o;
+
+  index_valpair_t *invalpair;
+
   for (o = 0; o < tokenarray_in->length; o++) {
 
     if ((((tokenarray_in->Tokenarray + o)->token_type) / 10) != 1) {
       op_no++;
     }
   }
+  invalpair = malloc(sizeof(index_valpair_t) * op_no);
 
   printf("Total Number of Operators: %d \n", op_no);
 
@@ -372,8 +389,12 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
   for (o = 0; o < tokenarray_in->length; o++) {
     if (((tokenarray_in->Tokenarray + o)->token_type) / 10 != 1) {
       *(op_index + o) = o;
+      (invalpair + o)->index = o;
+      (invalpair + o)->value = (tokenarray_in->Tokenarray + o)->token_type;
     }
   }
+
+  qsort(invalpair, op_no, sizeof(index_valpair_t), compare);
 }
 
 int main() {
