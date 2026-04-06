@@ -305,7 +305,8 @@ token_t *operate(tokenarray_t *tokenarray_in) {
   printf("Reached Operate func");
   int operand_1 = atoi((*(tokenarray_in->Tokenarray)).token);
   int operand_2 = atoi((*(tokenarray_in->Tokenarray + 2)).token);
-  printf(" Operands are %d and %d \n", operand_1, operand_2);
+  printf(" Operands are %d and %d operator is : %s\n", operand_1, operand_2,
+         (tokenarray_in->Tokenarray + 1)->token);
   int result;
   if ((*(tokenarray_in->Tokenarray + 1)).token[0] == '+') {
     result = operand_1 + operand_2;
@@ -415,24 +416,48 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
   input_array->Tokenarray = malloc(sizeof(token_t) * 3);
 
   qsort(invalpair, op_no, sizeof(index_valpair_t), compare);
+  printf("Printing Tokenarray Before Processing \n");
+  printf("i : token : type \n");
+  for (int i = 0; i < tokenarray_in->length + 1; i++) {
+    printf("%d : %s : %d \n", i, ((tokenarray_in->Tokenarray) + i)->token,
+           ((tokenarray_in->Tokenarray) + i)->token_type);
+  };
+
   for (o = 0; o < op_no; o++) {
-    printf("%d \n", (invalpair + o)->index);
+    // printf("%d \n", (invalpair + o)->index);
     token_t *output_token;
-    int operand_1 = invalpair->index - 1;
-    int operand_2 = invalpair->index + 1;
+    int operand_1 = (invalpair + o)->index - 1;
+    int operand_2 = (invalpair + o)->index + 1;
     input_array->length = 3;
     input_array->capacity = 3;
-    input_array->Tokenarray = (tokenarray_in->Tokenarray + operand_1);
-    input_array->Tokenarray = tokenarray_in->Tokenarray + operand_2;
-
+    *(input_array->Tokenarray) = *(tokenarray_in->Tokenarray + operand_1);
+    *(input_array->Tokenarray + 2) = *(tokenarray_in->Tokenarray + operand_2);
+    *(input_array->Tokenarray + 1) =
+        *(tokenarray_in->Tokenarray + operand_1 + 1);
+    printf(" Operator Index: %d Processing %s %s %s \n", (invalpair + o)->index,
+           (tokenarray_in->Tokenarray + operand_1)->token,
+           (tokenarray_in->Tokenarray + operand_1 + 1)->token,
+           (tokenarray_in->Tokenarray + operand_2)->token);
     output_token = operate(input_array);
-    for (int i = operand_1 + 1; i < tokenarray_in->length; i++) {
-      strcpy((tokenarray_in->Tokenarray + i)->token,
-             (tokenarray_in->Tokenarray + 1 + i)->token);
-      (tokenarray_in->Tokenarray + i)->token_type =
-          (tokenarray_in->Tokenarray + i + 1)->token_type;
-      (tokenarray_in->Tokenarray + i)->token_length =
-          (tokenarray_in->Tokenarray + i + 1)->token_length;
+    // DEBUG
+
+    printf("Printing Tokenarray o = %d \n", o);
+    printf("i : token : type \n");
+    for (int i = 0; i < tokenarray_in->length + 1; i++) {
+      printf("%d : %s : %d \n", i, ((tokenarray_in->Tokenarray) + i)->token,
+             ((tokenarray_in->Tokenarray) + i)->token_type);
+    };
+
+    // DEBUG
+    if (operand_1 < tokenarray_in->length + 2) {
+      for (int i = operand_1; i < tokenarray_in->length + 1; i++) {
+        strcpy((tokenarray_in->Tokenarray + i)->token,
+               (tokenarray_in->Tokenarray + 2 + i)->token);
+        (tokenarray_in->Tokenarray + i)->token_type =
+            (tokenarray_in->Tokenarray + i + 2)->token_type;
+        (tokenarray_in->Tokenarray + i)->token_length =
+            (tokenarray_in->Tokenarray + i + 2)->token_length;
+      }
     }
     for (int i = o + 1; i < op_no; i++) {
       if ((invalpair + i)->index > (invalpair + o)->index) {
@@ -441,6 +466,13 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
     }
     tokenarray_in->length -= 2;
     *(tokenarray_in->Tokenarray + operand_1) = *output_token;
+    printf("Rewriting output token. Value = %s \n", output_token->token);
+    printf("Printing Tokenarray After output o = %d \n", o);
+    printf("i : token : type \n");
+    for (int i = 0; i < tokenarray_in->length + 1; i++) {
+      printf("%d : %s : %d \n", i, ((tokenarray_in->Tokenarray) + i)->token,
+             ((tokenarray_in->Tokenarray) + i)->token_type);
+    };
   }
   return tokenarray_in;
 }
@@ -449,13 +481,13 @@ int main() {
 
   printf("Interpreter Launched\n");
   char line[100];
-  strcpy(line, "    5 -16 / 89 * 43 + 3 - 56  "); // line to eval
-  tokenarray_t *tokens = neotokenize(line);       // debug
+  strcpy(line, "    8 / 4 / 2  ");          // line to eval
+  tokenarray_t *tokens = neotokenize(line); // debug
                                             // printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
   tokenarray_t *processed_tokens = neoprocessor(tokens);
   // tokenarray_t *processed_tokens = processor(tokens);
-  for (int i = 0; i < processed_tokens->length; i++) {
+  for (int i = 0; i < processed_tokens->length + 1; i++) {
     printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
            ((processed_tokens->Tokenarray) + i)->token_type);
   };
