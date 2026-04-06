@@ -411,11 +411,38 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
       continue;
     }
   }
+  tokenarray_t *input_array = malloc(sizeof(tokenarray_t));
+  input_array->Tokenarray = malloc(sizeof(token_t) * 3);
 
   qsort(invalpair, op_no, sizeof(index_valpair_t), compare);
   for (o = 0; o < op_no; o++) {
     printf("%d \n", (invalpair + o)->index);
+    token_t *output_token;
+    int operand_1 = invalpair->index - 1;
+    int operand_2 = invalpair->index + 1;
+    input_array->length = 3;
+    input_array->capacity = 3;
+    input_array->Tokenarray = (tokenarray_in->Tokenarray + operand_1);
+    input_array->Tokenarray = tokenarray_in->Tokenarray + operand_2;
+
+    output_token = operate(input_array);
+    for (int i = operand_1 + 1; i < tokenarray_in->length; i++) {
+      strcpy((tokenarray_in->Tokenarray + i)->token,
+             (tokenarray_in->Tokenarray + 1 + i)->token);
+      (tokenarray_in->Tokenarray + i)->token_type =
+          (tokenarray_in->Tokenarray + i + 1)->token_type;
+      (tokenarray_in->Tokenarray + i)->token_length =
+          (tokenarray_in->Tokenarray + i + 1)->token_length;
+    }
+    for (int i = o + 1; i < op_no; i++) {
+      if ((invalpair + i)->index > (invalpair + o)->index) {
+        (invalpair + i)->index -= 2;
+      }
+    }
+    tokenarray_in->length -= 2;
+    *(tokenarray_in->Tokenarray + operand_1) = *output_token;
   }
+  return tokenarray_in;
 }
 
 int main() {
@@ -426,11 +453,12 @@ int main() {
   tokenarray_t *tokens = neotokenize(line);       // debug
                                             // printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
-  /*  tokenarray_t *processed_tokens = processor(tokens);
-    for (int i = 0; i < processed_tokens->length; i++) {
-      printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
+  tokenarray_t *processed_tokens = neoprocessor(tokens);
+  // tokenarray_t *processed_tokens = processor(tokens);
+  for (int i = 0; i < processed_tokens->length; i++) {
+    printf("%d : %s : %d \n", i, ((processed_tokens->Tokenarray) + i)->token,
            ((processed_tokens->Tokenarray) + i)->token_type);
-    };*/
+  };
   //  printf("Launching Processor \n");
   //  processor(tokens);
   // char * msg = trim(line); // debug
@@ -438,8 +466,6 @@ int main() {
   // free(msg); //debug
   //
   //
-
-  neoprocessor(tokens);
 
   return 0;
 }
