@@ -5,6 +5,7 @@
 #include <string.h>
 #include <strings.h>
 #define operators "/=-*<>+"
+#define tokenizers " \")([]"
 
 typedef struct Token {
   char token[10];
@@ -204,7 +205,7 @@ tokenarray_t *neotokenize(char *lineptr) {
       c_chtkmkr = 0;
       p_chtkmkr = 0;
     } else {
-      if (c_ch == ' ') {
+      if (strchr(tokenizers, c_ch) != NULL) {
         c_chtkmkr = 1;
       }
       if ((strchr(operators, n_ch) != NULL) &&
@@ -252,7 +253,12 @@ tokenarray_t *neotokenize(char *lineptr) {
     // typedef for tokens
     if (isalpha(cur_token->token[0])) {
       // future expansion for keywords
-      cur_token->token_type = 12;
+      //      cur_token->token_type = 12;
+      if (cur_token->token[0] == '"') {
+        cur_token->token_type = 12;
+      } else {
+        cur_token->token_type = 30;
+      }
     }
     if (isdigit(cur_token->token[0])) {
       cur_token->token_type = 10;
@@ -265,16 +271,28 @@ tokenarray_t *neotokenize(char *lineptr) {
         cur_token->token_type = 20;
       }
       if (*cur_token->token == '/') {
-        cur_token->token_type = 24;
+        cur_token->token_type = 28;
       }
       if (*cur_token->token == '*') {
-        cur_token->token_type = 23;
+        cur_token->token_type = 27;
       }
       if (*cur_token->token == '+') {
-        cur_token->token_type = 22;
+        cur_token->token_type = 26;
       }
       if (*cur_token->token == '-') {
+        cur_token->token_type = 25;
+      }
+      if (strcmp(cur_token->token, "==") == 0) {
         cur_token->token_type = 21;
+      }
+      if (strcmp(cur_token->token, "<=") == 0) {
+        cur_token->token_type = 22;
+      }
+      if (strcmp(cur_token->token, ">=") == 0) {
+        cur_token->token_type = 23;
+      }
+      if (strcmp(cur_token->token, "!=") == 0) {
+        cur_token->token_type = 24;
       }
     }
     cur_token->token[cur_token->token_length] = '\0';
