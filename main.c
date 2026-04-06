@@ -480,8 +480,30 @@ tokenarray_t *neoprocessor(tokenarray_t *tokenarray_in) {
 int main() {
 
   printf("Interpreter Launched\n");
-  char line[100];
-  strcpy(line, "    8 / 4 / 2  ");          // line to eval
+  // char line[100];
+  // strcpy(line, "    8 / 4 / 2  ");
+
+  printf("Input: ");
+  char *line = NULL;
+  size_t len = 0;
+
+  printf("Lexer (Default if empty) > ");
+
+  ssize_t bytes_read = getline(&line, &len, stdin);
+
+  // 1. Remove the \n
+  if (bytes_read > 0 && line[bytes_read - 1] == '\n') {
+    line[bytes_read - 1] = '\0';
+  }
+
+  // 2. Handle the "Lazy Case" (Empty Input)
+  // If the first character is the null terminator, it means it's empty
+  if (line[0] == '\0') {
+    free(line); // Free the empty buffer
+    line = strdup(
+        " 8-9   + 6/ 8-2*   9   "); // Duplicate your default string into 'line'
+  }
+
   tokenarray_t *tokens = neotokenize(line); // debug
                                             // printf("%d \n", tokens->length);
   //	printf("Printing token values:\n");
